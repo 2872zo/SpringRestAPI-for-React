@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="UserMapper">
+ 	
+ 	
+	<resultMap id="userSelectMap" type="User">
+		<result property="userNo" 				column="user_no" 				jdbcType="NUMERIC"/>
+		<result property="userId" 				column="user_id" 				jdbcType="VARCHAR"/>
+		<result property="username"				column="username" 				jdbcType="VARCHAR"/>
+		<result property="password"				column="password" 				jdbcType="VARCHAR"/>
+		<result property="regDate"				column="reg_date" 				jdbcType="DATE"/>
+	</resultMap>
+	
+	<insert 	id="addUser"		parameterType="User" >
+	 	<selectKey keyProperty="userNo" resultType="int" order="AFTER">
+	 		SELECT SEQ_USERS_USER_NO.CURRVAL FROM DUAL
+	 	</selectKey>
+		INSERT INTO USERS 
+			(user_no, 
+			user_id, 
+			username, 
+			password,
+			reg_date) 
+		VALUES 
+			(SEQ_USERS_USER_NO.NEXTVAL, 
+			 #{userId:VARCHAR}, 
+			 #{username:VARCHAR}, 
+			 #{password:VARCHAR}, 
+			 SYSDATE)
+	</insert>
+	 
+	 <select id="getUser" parameterType="User" resultMap="userSelectMap">
+	 	SELECT
+	 		*
+	 	FROM users u
+	 	WHERE
+	 		u.user_id = #{userId}
+	 </select>
+	
+	<update id="updateUser" parameterType="User">
+	   	UPDATE 
+	   		users
+	   	SET
+	   		user_name = #{userName:VARCHAR},
+			password = #{password:VARCHAR},
+		WHERE user_no = #{userNo:NUMERIC}
+	</update>
+	
+	<delete id="deleteUser" parameterType="User">
+		DELETE 
+			users 
+		WHERE
+			<if test="userNo != null">user_no = #{userNo}</if>
+			<if test="userid != null">AND user_id = #{userID}</if>
+	</delete>
+	
+	 
+</mapper>
