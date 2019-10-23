@@ -17,15 +17,20 @@ public class UserDAOImpl implements UserDAO {
 	public UserDAOImpl() {
 		System.out.println(this.getClass());
 	}
-	
+
 	@Override
 	public int addUser(User user) {
 		return sqlSession.insert("UserMapper.addUser", user);
 	}
 
 	@Override
-	public User getUser(User user) {
-		return sqlSession.selectOne("UserMapper.getUser", user);
+	public String getSalt(String userId) {
+		return sqlSession.selectOne("UserMapper.getSalt", userId);
+	}
+
+	@Override
+	public User authenticate(User user) {
+		return sqlSession.selectOne("UserMapper.authenticate", user);
 	}
 
 	@Override
@@ -36,6 +41,11 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public int deleteUser(User user) {
 		return sqlSession.insert("UserMapper.deleteUser", user);
+	}
+
+	@Override
+	public User userValidationCheck(String userId) {
+		return sqlSession.selectOne("UserMapper.userValidationCheck", userId);
 	}
 
 }

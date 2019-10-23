@@ -12,7 +12,8 @@
 		<result property="userId" 				column="user_id" 				jdbcType="VARCHAR"/>
 		<result property="username"				column="username" 				jdbcType="VARCHAR"/>
 		<result property="password"				column="password" 				jdbcType="VARCHAR"/>
-		<result property="regDate"				column="reg_date" 				jdbcType="DATE"/>
+		<result property="regDate"				column="reg_date" 				jdbcType="VARCHAR"/>
+		<result property="salt"					column="salt" 					jdbcType="VARCHAR"/>
 	</resultMap>
 	
 	<insert 	id="addUser"		parameterType="User" >
@@ -24,22 +25,36 @@
 			user_id, 
 			username, 
 			password,
-			reg_date) 
+			reg_date,
+			salt) 
 		VALUES 
 			(SEQ_USERS_USER_NO.NEXTVAL, 
 			 #{userId:VARCHAR}, 
 			 #{username:VARCHAR}, 
 			 #{password:VARCHAR}, 
-			 SYSDATE)
+			 SYSDATE,
+			 #{salt:VARCHAR})
 	</insert>
+	
+	<select id="getSalt" parameterType="String" resultType="String">
+		SELECT
+			salt
+		FROM users
+		WHERE
+			user_id = #{value}
+	</select>
 	 
-	 <select id="getUser" parameterType="User" resultMap="userSelectMap">
-	 	SELECT
-	 		*
-	 	FROM users u
-	 	WHERE
-	 		u.user_id = #{userId}
-	 </select>
+	<select id="authenticate" parameterType="User" resultMap="userSelectMap">
+		SELECT
+			user_no, 
+			user_id, 
+			username, 
+			TO_CHAR(reg_date, 'YYYY-MM-DD HH24:MI:SS') AS reg_date
+		FROM users u
+		WHERE
+			u.user_id = #{userId}
+			AND u.password = #{password:VARCHAR}
+	</select>
 	
 	<update id="updateUser" parameterType="User">
 	   	UPDATE 
@@ -58,5 +73,11 @@
 			<if test="userid != null">AND user_id = #{userID}</if>
 	</delete>
 	
-	 
+	<select id="userValidationCheck" parameterType="String" resultMap="userSelectMap">
+		SELECT
+			user_id
+		FROM users
+		WHERE
+			user_id = #{value}
+	</select>
 </mapper>

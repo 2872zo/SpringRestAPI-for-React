@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PostMapper">
+	<resultMap id="postSelectMap" type="Post">
+		<result property="postNo" 				column="post_no" 				jdbcType="NUMERIC"/>
+		<result property="title" 				column="title" 					jdbcType="VARCHAR"/>
+		<result property="body"					column="body" 					jdbcType="VARCHAR"/>
+		<result property="tags"					column="tags" 					jdbcType="VARCHAR"/>
+		<result property="publishedDate"		column="published_date" 		jdbcType="DATE"/>
+		<result property="updatedDate"			column="updated_date" 			jdbcType="DATE"/>
+		<result property="user.userNo"			column="user_no" 				jdbcType="NUMERIC"/>
+		<result property="user.userId"			column="user_id" 				jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<select id="getPosts" parameterType="Search" resultMap="postSelectMap">
+		SELECT
+			*
+		FROM posts p
+		<where>
+			p.title like '%${keyword}%'
+		</where>
+	</select>
+
+	<select id="getPost" parameterType="int" resultMap="postSelectMap">
+		SELECT
+			*
+		FROM posts p
+		WHERE
+			p.post_no = #{postNo}
+	</select>
+	
+	<insert id="addPost" parameterType="Post">
+	 	<selectKey keyProperty="postNo" resultType="int" order="AFTER">
+	 		SELECT SEQ_POSTS_POST_NO.CURRVAL FROM DUAL
+	 	</selectKey>
+		INSERT INTO POSTS
+			(post_no, 
+			title, 
+			body, 
+			tags,
+			published_date,
+			updated_date) 
+		VALUES 
+			(SEQ_POSTS_POST_NO.NEXTVAL, 
+			 #{title:VARCHAR}, 
+			 #{body:VARCHAR}, 
+			 #{tags:VARCHAR}, 
+			 SYSDATE,
+			 SYSDATE)
+	</insert>
+	 
+	<update id="updatePost" parameterType="Post">
+		<selectKey keyProperty="updatedDate" resultType="DATE" order="AFTER">
+	 		SELECT SYSDATE FROM DUAL
+	 	</selectKey>
+	   	UPDATE 
+	   		posts
+	   	SET
+	   		title = #{title:VARCHAR},
+			body = #{body:VARCHAR},
+			tags = #{tags:VARCHAR},
+			updated_date = SYSDATE
+		WHERE post_no = #{postNo:NUMERIC}
+	</update>
+	
+	<delete id="deletePost" parameterType="int">
+		DELETE 
+			posts p
+		WHERE
+			p.post_id = #{value}
+	</delete>
+</mapper>
