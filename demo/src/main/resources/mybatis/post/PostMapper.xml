@@ -9,11 +9,12 @@
 		<result property="postNo" 				column="post_no" 				jdbcType="NUMERIC"/>
 		<result property="title" 				column="title" 					jdbcType="VARCHAR"/>
 		<result property="body"					column="body" 					jdbcType="VARCHAR"/>
-		<result property="tags"					column="tags" 					jdbcType="VARCHAR"/>
+		<result property="tagsString"			column="tags" 					jdbcType="VARCHAR"/>
 		<result property="publishedDate"		column="published_date" 		jdbcType="DATE"/>
 		<result property="updatedDate"			column="updated_date" 			jdbcType="DATE"/>
 		<result property="user.userNo"			column="user_no" 				jdbcType="NUMERIC"/>
 		<result property="user.userId"			column="user_id" 				jdbcType="VARCHAR"/>
+		<result property="user.username"		column="username" 				jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<select id="getPosts" parameterType="Search" resultMap="postSelectMap">
@@ -43,14 +44,20 @@
 			body, 
 			tags,
 			published_date,
-			updated_date) 
+			updated_date,
+			user_no,
+			user_id,
+			username) 
 		VALUES 
 			(SEQ_POSTS_POST_NO.NEXTVAL, 
 			 #{title:VARCHAR}, 
 			 #{body:VARCHAR}, 
-			 #{tags:VARCHAR}, 
+			 #{tagsString:VARCHAR}, 
 			 SYSDATE,
-			 SYSDATE)
+			 SYSDATE,
+			 #{user.userNo},
+			 #{user.userId},
+			 #{user.username})
 	</insert>
 	 
 	<update id="updatePost" parameterType="Post">
@@ -62,7 +69,7 @@
 	   	SET
 	   		title = #{title:VARCHAR},
 			body = #{body:VARCHAR},
-			tags = #{tags:VARCHAR},
+			tags = #{tagsString:VARCHAR},
 			updated_date = SYSDATE
 		WHERE post_no = #{postNo:NUMERIC}
 	</update>
@@ -71,6 +78,6 @@
 		DELETE 
 			posts p
 		WHERE
-			p.post_id = #{value}
+			p.post_no = #{value}
 	</delete>
 </mapper>

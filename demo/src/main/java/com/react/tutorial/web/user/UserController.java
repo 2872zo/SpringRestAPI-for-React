@@ -68,6 +68,7 @@ public class UserController {
 			
 			Cookie accessToken = new Cookie(tokenName, jwt);
 			accessToken.setMaxAge(-1);
+			accessToken.setPath("/");
 			response.addCookie(accessToken);
 		}
 		
@@ -95,6 +96,7 @@ public class UserController {
 			SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm");
 			user.setRegDate(df.parse(claims.get("regDate").toString()));
 		}catch(Exception e) {
+			//유효시간 지났을 경우
 			response.sendError(401);
 		}
 		
